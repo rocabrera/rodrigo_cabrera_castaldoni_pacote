@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rodrigo-ml-communication" 
+authors = [
+    {name = "Rodrigo Castaldoni", email = "rodrigo.castal@fakeEmail.com"}
+]
+description = "Esse pacote vai ser utilizado na aula para mostrar como criar um pacote Python"
+readme = "src/README.md"
+requires-python = ">=3.11"
+dynamic = ["dependencies", "version"]
+
+[tool.setuptools_scm]
+version_scheme = "no-guess-dev"
+local_scheme = "no-local-version"
