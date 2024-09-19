@@ -29,6 +29,7 @@ class FileSystemModelStorage(ModelStorage):
         except Exception as e:
             print(e)
             return None
+
         else:
             return str(path)
 
