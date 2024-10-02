@@ -3,25 +3,25 @@ from typing import Any
 from pathlib import Path
 from abc import ABC, abstractmethod
 
+
 class ModelStorage(ABC):
     @abstractmethod
     def add(self, filename: str, model: Any) -> str | None:
-        pass 
+        pass
 
     @abstractmethod
     def delete(self, key: str) -> bool:
         pass
-    
+
     @abstractmethod
     def get(self, key: str) -> Any | None:
         pass
 
 
 class FileSystemModelStorage(ModelStorage):
-
     def add(self, filename: Path, model: Any) -> str | None:
         try:
-            path = (Path("tmp") / filename)
+            path = Path("tmp") / filename
             path.parent.mkdir(parents=True, exist_ok=True)
             with path.open(mode="wb") as f:
                 pickle.dump(model, f)
@@ -47,7 +47,7 @@ class FileSystemModelStorage(ModelStorage):
         if path.exists():
             with path.open(mode="rb") as f:
                 return pickle.load(f)
-            
+
 
 class InMemoryModelStorage(ModelStorage):
     def __init__(self):
@@ -72,4 +72,4 @@ class InMemoryModelStorage(ModelStorage):
             return True
 
     def get(self, key: str) -> Any | None:
-        return self.data.get(key, None) 
+        return self.data.get(key, None)
