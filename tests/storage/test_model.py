@@ -1,6 +1,6 @@
 import unittest
-from unittest.mock import MagicMock, patch
-from src.rodrigo_ml_communication.storage import InMemoryModelStorage, FileSystemModelStorage
+from unittest.mock import MagicMock
+from src.rodrigo_ml_communication.storage import InMemoryModelStorage
 
 
 class TestModelStorage(unittest.TestCase):
@@ -22,6 +22,7 @@ class TestModelStorage(unittest.TestCase):
 
 		retrieved_model = storage.get(self.model_path)
 		self.assertIsNone(retrieved_model)
+
 
 if __name__ == '__main__':
 	unittest.main()
