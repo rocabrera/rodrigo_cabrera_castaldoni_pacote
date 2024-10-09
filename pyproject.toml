@@ -28,5 +28,5 @@ indent-style = "tab"
 docstring-code-format = true
 
 [tool.bandit]
-exclude_dirs = ["tests"]
+exclude_dirs = ["tests", "pacote"]
 skips = ["B301", "B403"]
