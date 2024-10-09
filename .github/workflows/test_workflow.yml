@@ -2,12 +2,18 @@ name: Primeiro Workflow
 
 on: 
   pull_request:
-    branches: ["master"]
+    branches: ["main"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Hello World
-        run: echo "Criando meu primeiro workflow"
+      - name: Baixando repositório
+        run: actions/checkout@v4
+
+      - name: Configurando Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          architecture: 'x64'
