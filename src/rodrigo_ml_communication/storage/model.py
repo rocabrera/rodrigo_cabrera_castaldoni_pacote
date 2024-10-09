@@ -72,4 +72,4 @@ class InMemoryModelStorage(ModelStorage):
             return True
 
     def get(self, key: str) -> Any | None:
-        return self.data.get(key, None)
+        return None
