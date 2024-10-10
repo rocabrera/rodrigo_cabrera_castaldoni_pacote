@@ -43,6 +43,7 @@ jobs:
               exit 1
           fi
           echo $NEW_VERSION
+          
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
 
   publish:
