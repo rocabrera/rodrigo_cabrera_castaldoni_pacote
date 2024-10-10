@@ -43,7 +43,7 @@ jobs:
               exit 1
           fi
           echo $NEW_VERSION
-          
+
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
 
   publish:
@@ -98,3 +98,4 @@ jobs:
         run: |
           echo "${{ needs.increase_version.outputs.NEW_VERSION }}"
           git push origin "${{ needs.increase_version.outputs.NEW_VERSION }}"
+
