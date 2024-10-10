@@ -1,0 +1,99 @@
+name: Segundo Workflow
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+
+  increase_version:
+    # Sem a tag needs o job de CD seria executado de forma paralela.
+    # Dessa forma, a execução do CD depende do CI ser executado com sucesso.
+    runs-on: ubuntu-latest
+    
+    outputs:
+      NEW_VERSION: ${{ steps.tag_increase.outputs.NEW_VERSION }}
+
+    steps:
+
+      - name: Baixando repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Incrementa versão
+        id: tag_increase
+        run: |
+          last_commit=$(git log -1 --no-merges --pretty=%B)
+          echo $last_commit
+          if [[ $last_commit == patch* ]]; then
+              NEW_VERSION=`git describe --tags --abbrev=0 | awk -F. '{OFS="."; $3+=1; print $0}'`
+          elif [[ $last_commit == minor* ]]; then
+              NEW_VERSION=`git describe --tags --abbrev=0 | awk -F. '{OFS="."; $2+=1; $3=0; print $0}'`
+          elif [[ $last_commit == major* ]]; then
+              NEW_VERSION=`git describe --tags --abbrev=0 | awk -F. '{OFS="."; sub(/^v/, "", $1); $1+=1; $2=0; $3=0; print "v"$0}'`
+          else
+              echo "Não especifica versao, logo não executa código"
+              exit 1
+          fi
+
+          if ![[ $NEW_VERSION == v* ]]; then
+              echo "Precisa comecar com v a versão"
+              exit 1
+          fi
+
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+  publish:
+    needs: [increase_version]
+
+    runs-on: ubuntu-latest
+    
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/rodrigo-ml-communication
+
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+
+      - name: Baixando repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Adiciona Tag
+
+        run: |
+          git config user.name "$(git log -n 1 --pretty=format:%an)"
+          git config user.email "$(git log -n 1 --pretty=format:%ae)"
+          git tag -a "${{ needs.increase_version.outputs.NEW_VERSION }}" -m "change version"
+          git tag
+
+
+      - name: Configurando Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          architecture: 'x64'
+
+      - name: Instalando dependências de publicação do pacote
+        run: pip install -U build==1.2.1 twine==5.1.1
+
+
+      - name: Cria o diretório da distribuição
+        run: python3 -m build
+
+      - name: Publish distribution 📦 to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+      - name: Update package tag
+        run: |
+          echo "${{ needs.increase_version.outputs.NEW_VERSION }}"
+          git push origin "${{ needs.increase_version.outputs.NEW_VERSION }}"
